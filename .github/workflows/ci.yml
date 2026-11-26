@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Base de datos desechable: existe solo durante la ejecucion, por eso su clave no es un secreto.
+    services:
+      db:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: unireserva
+          POSTGRES_USER: unireserva
+          POSTGRES_PASSWORD: solo-ci-efimera
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U unireserva -d unireserva"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Compilar y probar
+        run: ./mvnw -B verify
+        env:
+          POSTGRES_PASSWORD: solo-ci-efimera

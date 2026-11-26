@@ -1,0 +1,18 @@
+# Compilacion
+target/
+
+# Secretos locales
+.env
+.env.*
+!.env.example
+
+# IDE y sistema
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+Thumbs.db
+.DS_Store
+*.log
