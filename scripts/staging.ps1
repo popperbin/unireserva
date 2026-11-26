@@ -33,6 +33,9 @@ function Assert-Exito([string]$Paso) {
     if ($LASTEXITCODE -ne 0) { throw "Fallo: $Paso (codigo $LASTEXITCODE)" }
 }
 
+# Carpeta corta: Windows limita la longitud de las rutas.
+function Get-DirVersion([string]$Sha) { Join-Path $Base "v\$($Sha.Substring(0, 12))" }
+
 function Get-Actual {
     if (Test-Path $ArchivoActual) { (Get-Content $ArchivoActual -TotalCount 1).Trim() }
 }
@@ -40,7 +43,7 @@ function Get-Actual {
 # Ejecuta Docker Compose con los archivos de una version concreta.
 function Invoke-Compose([string]$Sha, [string[]]$Argumentos) {
     $env:APP_TAG = $Sha
-    $archivoCompose = Join-Path $Base "versiones\$Sha\compose.staging.yaml"
+    $archivoCompose = Join-Path (Get-DirVersion $Sha) 'compose.staging.yaml'
     docker compose -p $Proyecto --env-file $ArchivoEnv -f $archivoCompose --profile acceso @Argumentos
 }
 
@@ -62,9 +65,9 @@ function New-ArchivoEnv {
 # Solo se despliega un commit integrado en main y con la CI en verde.
 function Get-VersionAprobada([string]$Sha) {
     if ($Sha -notmatch '^[0-9a-f]{40}$') { throw 'Indica -Commit con el SHA completo (40 caracteres).' }
-    $destino = Join-Path $Base "versiones\$Sha"
+    $destino = Get-DirVersion $Sha
     if (-not (Test-Path $destino)) {
-        git clone --quiet "https://github.com/$Repositorio.git" $destino
+        git clone --quiet -c core.longpaths=true "https://github.com/$Repositorio.git" $destino
         Assert-Exito 'clonar el repositorio'
     }
     git -C $destino fetch --quiet origin main
