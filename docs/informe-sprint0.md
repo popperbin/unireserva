@@ -62,7 +62,7 @@ No incluido: Bootstrap (se añade con la primera vista), Spring Security, JPA, L
 | Ejecución del JAR | `java -jar target\unireserva-0.0.1-SNAPSHOT.jar` | Arranca en `127.0.0.1:8080`; `GET /` → 404 esperado |
 | Ejecución con Maven | `.\mvnw.cmd -B spring-boot:run` | Arranca; `GET /` → 404 esperado |
 
-La CI se verifica en la pestaña *Actions* del repositorio.
+CI en GitHub Actions (Ubuntu), commit `e5fa85e`: **success**, `Tests run: 1, Failures: 0, Errors: 0, Skipped: 0`, `BUILD SUCCESS` ([ejecución](https://github.com/popperbin/unireserva/actions/runs/45895531491)).
 
 Se usó un JDK 21 portátil temporal: **el equipo de Mateo no tiene JDK 21 instalado** y `JAVA_HOME` apunta a Java 8.
 
