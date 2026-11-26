@@ -1,0 +1,9 @@
+// Politica para una tailnet EXCLUSIVA de UniReserva. No aplicarla sobre una tailnet existente:
+// reemplaza la regla "permitir todo" y cortaria otros accesos.
+{
+  "grants": [
+    // El propietario y las personas invitadas solo llegan al puerto web.
+    { "src": ["autogroup:admin"], "dst": ["*"], "ip": ["443"] },
+    { "src": ["autogroup:shared"], "dst": ["*"], "ip": ["443"] }
+  ]
+}

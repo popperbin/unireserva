@@ -40,3 +40,11 @@ jobs:
         run: ./mvnw -B verify
         env:
           POSTGRES_PASSWORD: solo-ci-efimera
+      # Solo comprueba que staging sigue construyendose; no publica ni despliega nada.
+      - name: Validar staging y construir la imagen
+        run: |
+          docker compose -f compose.staging.yaml --profile acceso config --quiet
+          docker compose -f compose.staging.yaml build app
+        env:
+          POSTGRES_PASSWORD: solo-ci-efimera
+          APP_TAG: ci

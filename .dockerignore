@@ -1,0 +1,6 @@
+# Solo entra a la imagen lo necesario para compilar: asi .env nunca se copia.
+*
+!.mvn
+!mvnw
+!pom.xml
+!src

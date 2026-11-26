@@ -1,0 +1,95 @@
+# Staging privado en un equipo local. Se opera con scripts/staging.ps1 (ver docs/staging-local.md).
+# Ningun servicio publica puertos en el equipo anfitrion.
+name: unireserva-staging
+
+x-logs: &logs
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+services:
+  db:
+    image: postgres:17-alpine@sha256:f9cf3e1f0066f0eb0c48707d864f0ac5941e9ff454a072077d97a4d278d07d73
+    environment:
+      POSTGRES_DB: unireserva
+      POSTGRES_USER: unireserva_staging
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}
+    volumes: [datos:/var/lib/postgresql/data]
+    networks: [datos]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U unireserva_staging -d unireserva"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
+    pids_limit: 100
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    logging: *logs
+
+  app:
+    build: .
+    image: unireserva:${APP_TAG:?falta APP_TAG}
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/unireserva
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+      POSTGRES_USER: unireserva_staging
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}
+      # Escucha dentro de su red de contenedores; no se publica en el anfitrion.
+      SERVER_ADDRESS: 0.0.0.0
+    networks: [datos, web]
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck:
+      # Spring abre el puerto solo cuando arranco bien, incluida la migracion de Flyway.
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 60s
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1.0
+    pids_limit: 200
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    logging: *logs
+
+  # Acceso remoto: nodo Tailscale propio, aparte del Tailscale del equipo anfitrion.
+  # Solo arranca con el perfil "acceso" y tras la aprobacion del propietario.
+  tailscale:
+    profiles: [acceso]
+    image: tailscale/tailscale:v1.104.7@sha256:72c1e19e0aedca96b8533bbb0b4368564410ff20b17e53b804eb6c1f04a31be4
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:-}
+      TS_AUTH_ONCE: "true"
+      TS_HOSTNAME: unireserva-staging
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_SERVE_CONFIG: /config/serve.json
+      TS_USERSPACE: "true"
+    volumes:
+      - tailscale:/var/lib/tailscale
+      - ./deploy/tailscale:/config:ro
+    networks: [web, salida]
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.25
+    pids_limit: 100
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    logging: *logs
+
+networks:
+  datos:
+    internal: true # base de datos <-> aplicacion, sin salida
+  web:
+    internal: true # aplicacion <-> tailscale, sin salida
+  salida: {}       # unica red con Internet; solo la usa tailscale
+
+volumes:
+  datos:
+  tailscale:
