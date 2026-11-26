@@ -8,7 +8,7 @@ Sprint 0 completado. **No implementar funcionalidad de negocio** hasta que el eq
 
 ## Stack (preliminar)
 
-Java 21, Spring Boot, Maven Wrapper, PostgreSQL, Spring JDBC (no JPA), Flyway, Thymeleaf, Bootstrap (aún sin incorporar), JUnit y Mockito. Monolito modular con arquitectura hexagonal.
+Java 21, Spring Boot, Maven Wrapper, PostgreSQL, Spring JDBC (no JPA), Flyway, JUnit y Mockito. Aplicación de consola (sin web ni API REST). Monolito modular con arquitectura hexagonal.
 
 ## Verificación
 
@@ -16,11 +16,12 @@ Java 21, Spring Boot, Maven Wrapper, PostgreSQL, Spring JDBC (no JPA), Flyway, T
 
 ## Reglas
 
-- El dominio no depende de Spring, JDBC ni web. Los controladores no acceden a datos.
+- El dominio no depende de Spring, JDBC ni consola. Los menús no acceden a datos ni contienen reglas, validaciones de negocio o permisos.
 - Un módulo no accede a tablas ni clases internas de otro.
 - No definir el modelo de datos ni añadir dependencias sin aprobación del equipo.
 - No editar migraciones ya integradas en `main`.
 - No inventar resultados: informar comandos ejecutados y su salida real.
 - Sin secretos en el repositorio. Sin despliegues ni servicios de pago.
+- El repositorio es público: no publicar datos de servidores, credenciales ni datos personales.
 - No usar infraestructura ni credenciales ajenas a este proyecto.
 - Explicar al equipo cada decisión.

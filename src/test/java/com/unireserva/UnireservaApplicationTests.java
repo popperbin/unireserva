@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /** Prueba de arranque: requiere PostgreSQL en ejecucion (docker compose up -d --wait). */
@@ -14,6 +15,9 @@ class UnireservaApplicationTests {
 	@Autowired
 	JdbcClient jdbc;
 
+	@Autowired
+	ApplicationContext contexto;
+
 	@Test
 	void arrancaYFlywayPreparaLaBaseDeDatos() {
 		boolean existeHistorial = jdbc
@@ -22,6 +26,11 @@ class UnireservaApplicationTests {
 				.single();
 
 		assertThat(existeHistorial).isTrue();
+	}
+
+	@Test
+	void lasPruebasNoActivanElMenuInteractivo() {
+		assertThat(contexto.containsBean("menuConsola")).isFalse();
 	}
 
 }

@@ -1,5 +1,7 @@
 # Informe de inicialización: Sprint 0
 
+> Documento histórico. La parte web (Spring MVC, Thymeleaf, Tomcat, puerto 8080 y Bootstrap) se retiró: ver [ADR 0002](adr/0002-aplicacion-de-consola.md).
+
 Fecha: 2026-11-26 · Para revisión de Mateo Avellaneda, Michel Diaz y Nicolain de Castro.
 Preparado con asistencia de Claude Code.
 

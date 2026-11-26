@@ -40,3 +40,9 @@ jobs:
         run: ./mvnw -B verify
         env:
           POSTGRES_PASSWORD: solo-ci-efimera
+      # Arranca el JAR real, elige "0. Salir" y exige el mensaje de despedida.
+      - name: Arrancar la consola
+        run: echo 0 | timeout 60 java -jar target/unireserva-*.jar | tee consola.log && grep -q "Hasta luego" consola.log
+        shell: bash
+        env:
+          POSTGRES_PASSWORD: solo-ci-efimera
