@@ -11,24 +11,7 @@ permissions:
 jobs:
   verificar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    # Base de datos desechable: existe solo durante la ejecucion, por eso su clave no es un secreto.
-    services:
-      db:
-        image: postgres:17-alpine
-        env:
-          POSTGRES_DB: unireserva
-          POSTGRES_USER: unireserva
-          POSTGRES_PASSWORD: solo-ci-efimera
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd "pg_isready -h 127.0.0.1 -U unireserva -d unireserva"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -38,5 +21,7 @@ jobs:
           cache: maven
       - name: Compilar y probar
         run: ./mvnw -B verify
-        env:
-          POSTGRES_PASSWORD: solo-ci-efimera
+      # Arranca el JAR real, elige "0. Salir" y exige el mensaje de despedida.
+      - name: Arrancar la consola
+        run: echo 0 | timeout 60 java -jar target/unireserva-*.jar | tee consola.log && grep -q "Hasta luego" consola.log
+        shell: bash

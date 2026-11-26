@@ -1,25 +1,11 @@
 # Cómo colaborar
 
-Flujo propuesto, pendiente de aprobación del equipo.
-
-## Flujo
-
-1. Toma una tarea en Jira.
-2. Crea una rama desde `main`: `tipo/CLAVE-descripcion`, por ejemplo `feat/UNI-12-crear-reserva` (la clave real depende del proyecto Jira).
-3. Commits pequeños en formato `tipo: descripción` (`feat`, `fix`, `docs`, `test`, `chore`).
+1. Toma tu encargo (Jira registra el avance: Por hacer, En curso, Terminado).
+2. Crea una rama desde `main`, por ejemplo `feat/SCRUM-20-repositorios`.
+3. Commits pequeños: `feat`, `fix`, `docs`, `test` o `chore`, seguido de la descripción.
 4. Antes de subir: `.\mvnw.cmd verify` en verde.
-5. Abre un Pull Request. Otro integrante lo revisa; se integra con CI en verde. Sin push directo a `main`.
+5. Abre un Pull Request; otro integrante lo revisa. No se hace push directo a `main`.
 
-## Un cambio está terminado cuando
+Un cambio está terminado cuando compila, tiene pruebas, otro lo revisó, la documentación afectada coincide y quien lo entrega puede explicarlo.
 
-- Compila y las pruebas pasan.
-- Tiene pruebas de la lógica nueva.
-- Actualiza la documentación y diagramas afectados.
-- Quien lo entrega puede explicarlo en la sustentación.
-
-## Reglas
-
-- Los contratos (interfaces entre módulos) y el modelo de datos se acuerdan antes de implementarlos.
-- Una dependencia nueva se justifica en el Pull Request.
-- Una decisión arquitectónica se registra como ADR en `docs/adr/`.
-- Nunca subas `.env`, contraseñas ni tokens.
+Los contratos y el modelo se acuerdan antes de implementarlos. Una dependencia nueva requiere acuerdo del equipo. No se suben contraseñas, tokens ni datos personales.

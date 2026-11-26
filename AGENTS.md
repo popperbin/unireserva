@@ -1,26 +1,27 @@
 # Instrucciones para asistentes de IA
 
-Proyecto académico de tres estudiantes: deben poder entender y defender cada línea.
+Proyecto académico de tres estudiantes: deben poder entender y defender cada línea. El enunciado del profesor prevalece.
 
 ## Estado
 
-Sprint 0 completado. **No implementar funcionalidad de negocio** hasta que el equipo apruebe contratos y diseño.
+Base técnica. **No implementar funcionalidad de negocio** hasta que el equipo acuerde el diseño de detalle (`docs/diseno-minimo.md`).
 
-## Stack (preliminar)
+## Stack acordado
 
-Java 21, Spring Boot, Maven Wrapper, PostgreSQL, Spring JDBC (no JPA), Flyway, Thymeleaf, Bootstrap (aún sin incorporar), JUnit y Mockito. Monolito modular con arquitectura hexagonal.
+Java 21 puro, Maven Wrapper, JUnit, consola, hexagonal simplificada, persistencia simulada con `Map` y `List`, inyección por constructor, CQRS básico, GitHub Actions.
+
+Sin frameworks de aplicación, bases de datos, Docker, web, API REST, servicios externos ni despliegue.
 
 ## Verificación
 
-`docker compose up -d --wait` y luego `.\mvnw.cmd verify`.
+`.\mvnw.cmd verify`
 
 ## Reglas
 
-- El dominio no depende de Spring, JDBC ni web. Los controladores no acceden a datos.
-- Un módulo no accede a tablas ni clases internas de otro.
-- No definir el modelo de datos ni añadir dependencias sin aprobación del equipo.
-- No editar migraciones ya integradas en `main`.
+- `domain` no depende de `application` ni de adaptadores. `application` no depende de adaptadores.
+- La consola no accede a repositorios ni contiene reglas, validaciones de negocio o permisos.
+- No crear clases, interfaces ni paquetes vacíos o sin necesidad.
+- No añadir requisitos ajenos al enunciado ni dependencias sin acuerdo del equipo.
 - No inventar resultados: informar comandos ejecutados y su salida real.
-- Sin secretos en el repositorio. Sin despliegues ni servicios de pago.
+- El repositorio es público: sin secretos, datos de servidores ni datos personales.
 - No usar infraestructura ni credenciales ajenas a este proyecto.
-- Explicar al equipo cada decisión.
