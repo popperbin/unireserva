@@ -10,6 +10,8 @@ Prototipo académico para gestionar recursos y reservas universitarias (Arquitec
 | Michel Diaz | Arquitectura de datos, persistencia, usuarios y recursos |
 | Nicolain de Castro | Interfaz, patrones y arquitectura empresarial |
 
+¿Primera vez? Sigue la [guía de incorporación](docs/incorporacion.md).
+
 ## Requisitos
 
 - Git.

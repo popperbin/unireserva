@@ -22,5 +22,6 @@ Java 21, Spring Boot, Maven Wrapper, PostgreSQL, Spring JDBC (no JPA), Flyway, T
 - No editar migraciones ya integradas en `main`.
 - No inventar resultados: informar comandos ejecutados y su salida real.
 - Sin secretos en el repositorio. Sin despliegues ni servicios de pago.
+- El repositorio es público: no publicar datos de servidores, credenciales ni datos personales.
 - No usar infraestructura ni credenciales ajenas a este proyecto.
 - Explicar al equipo cada decisión.
