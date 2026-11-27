@@ -38,6 +38,8 @@ Si `.\mvnw.cmd -v` no muestra Java 21, ver la [guía de incorporación](docs/inc
 .mvn/, mvnw, mvnw.cmd           Maven Wrapper
 src/main/java/com/unireserva/
   Main.java                     Arranque y composición de objetos
+  domain/                       Entidades, estados y reglas propias
+  application/                  Puertos de repositorio, Observer y control de acceso
   consola/                      Menú (adaptador de entrada)
 src/test/java/                  Pruebas JUnit
 docs/diseno-minimo.md           Propuesta de diseño, encargos y matriz de cumplimiento
