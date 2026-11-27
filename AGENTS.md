@@ -1,6 +1,6 @@
 # Instrucciones para asistentes de IA
 
-Proyecto académico de tres estudiantes: deben poder entender y defender cada línea. El enunciado del profesor prevalece.
+Proyecto académico de dos estudiantes: deben poder entender y defender cada línea. El enunciado del profesor prevalece.
 
 ## Estado
 

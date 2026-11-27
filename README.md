@@ -8,9 +8,8 @@ Aplicación **Java 21 de consola**, sin frameworks ni base de datos. Los datos v
 
 | Integrante | Área |
 |---|---|
-| Mateo Avellaneda | Dominio de reservas, arquitectura, integración y contratos |
-| Michel Diaz | Datos, repositorios, usuarios, recursos y reportes |
-| Nicolain de Castro | Casos de uso, consola, notificaciones, patrones y TOGAF |
+| Mateo Avellaneda | Arquitectura, contratos, reservas, historial, reportes e integración |
+| Nicolain de Castro | Datos (ER), usuarios, recursos, consola, notificaciones, patrones y TOGAF |
 
 ## Ejecutar
 

@@ -46,7 +46,7 @@ En IntelliJ: *File → Project Structure → SDK → 21*.
 
 ## 5. Antes de programar
 
-Lee [CONTRIBUTING.md](../CONTRIBUTING.md) y la [propuesta de diseño](diseno-minimo.md). El código de negocio empieza cuando los tres acuerden el diseño de detalle.
+Lee [CONTRIBUTING.md](../CONTRIBUTING.md) y la [propuesta de diseño](diseno-minimo.md). El código de negocio empieza cuando ambos acuerden el diseño de detalle.
 
 ## Comprobación
 

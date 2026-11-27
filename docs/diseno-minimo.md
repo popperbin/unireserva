@@ -1,6 +1,6 @@
 # UniReserva: mínimo académico completo
 
-**Stack acordado por los tres integrantes** (documento maestro v0.4, según confirmación de Mateo). **El diseño de detalle es una propuesta sin aprobar; no hay funcionalidad implementada.** 26 de noviembre de 2026. Preparado con asistencia de Claude Code.
+**Equipo: Mateo Avellaneda y Nicolain de Castro. Stack mínimo acordado** (documento maestro v0.5). **El diseño de detalle es una propuesta sin aprobar; no hay funcionalidad implementada.** 27 de noviembre de 2026. Preparado con asistencia de Claude Code.
 
 Fuente que manda: el enunciado del profesor (§). Las tareas de Jira no se han revisado.
 
@@ -28,7 +28,7 @@ El Pull Request de simplificación contiene `Main`, un menú que solo permite sa
 
 ## 3. Estructura mínima
 
-Se organiza por capa: con unas 40 clases, pocas carpetas muestran la hexagonal con claridad. El documento v0.4 (pestaña 02) admite mantener módulos "si son útiles"; esta propuesta prescinde de ellos y hay que acordarlo (D2). Cada carpeta se crea con su primera clase.
+Se organiza por capa: con unas 40 clases, pocas carpetas muestran la hexagonal con claridad. El documento v0.5 (pestaña 02) admite mantener módulos "si son útiles"; esta propuesta prescinde de ellos y hay que acordarlo (D2). Cada carpeta se crea con su primera clase.
 
 ```text
 com.unireserva
@@ -179,7 +179,8 @@ public class ReporteConsultas {
     public List<Map.Entry<Recurso, Long>> generarReporteRecursosMasSolicitados(long actorId);
 }
 public class PublicadorReserva {
-    public void suscribir(ObservadorReserva observador);
+    public PublicadorReserva(RegistroHistorial historial);           // obligatorio: siempre se notifica primero
+    public void suscribir(ObservadorReserva observador);             // reacciones adicionales, como los avisos
     public void publicar(CambioEstado cambio);
 }
 public class RegistroHistorial implements ObservadorReserva {
@@ -205,24 +206,29 @@ Cada repositorio en memoria tiene un `Map<Long, Entidad>` (`LinkedHashMap`) y un
 | Justificación (§7) | Límite que se declara |
 |---|---|
 | Permite demostrar todas las funciones | No conserva datos entre ejecuciones |
-| Sin instalación: los tres ejecutan igual | No demuestra consultas SQL ni control de concurrencia |
+| Sin instalación: ambos ejecutan igual | No demuestra consultas SQL ni control de concurrencia |
 | El puerto `*Repository` permite añadir una base después sin cambiar el dominio | Esa migración es futura, no implementada |
 
-## 5. Reglas por decidir y reportes
+## 5. Decisiones y reportes
 
-| ID | Decisión propuesta |
-|---|---|
-| D1 | Revisar y fusionar el PR de simplificación; cerrar #1–#3 |
-| D2 | Estructura por capas de la sección 3, en lugar de módulos |
-| D3 | Identidad: elegir un usuario existente. No es autenticación |
-| D4 | Administrador gestiona usuarios y recursos; solicitante crea, cancela y consulta **solo lo suyo**; responsable aprueba, rechaza y finaliza; administrador y responsable consultan reservas y reportes |
-| D5 | No se crean ni aprueban reservas para recursos inactivos o en mantenimiento; se admiten pendientes solapadas |
-| D6 | Cancela el dueño una PENDIENTE o APROBADA; el responsable finaliza una APROBADA. **Abierto:** v0.4 propone cancelar solo antes del inicio y finalizar tras el fin. Recomendación: sin restricciones de hora, porque el enunciado no las pide y facilitan la demostración |
-| D7 | La creación queda en el historial con estado anterior vacío |
-| D8 | Observer y Facade, con la forma de la sección 6 |
-| D9 | Fecha de entrega y disponibilidad |
-| D10 | Disponibilidad por intervalo: v0.4 (CU-03) propone consultarla; §4.2 solo pide recursos disponibles. Recomendación: dejarla fuera |
-| D11 | Utilización: solo FINALIZADAS (v0.4) o también APROBADAS. Recomendación: seguir v0.4 |
+Criterio acordado: la alternativa más sencilla que cumpla íntegramente el enunciado.
+
+| ID | Decisión | Estado |
+|---|---|---|
+| D1 | Fusionar el PR de simplificación y cerrar #1–#3 | Pendiente |
+| D2 | Estructura por capas de la sección 3, en lugar de módulos | Aceptada |
+| D3 | Identidad: elegir un usuario existente y activo. No es autenticación | Adoptada |
+| D4 | Administrador gestiona usuarios y recursos; solicitante crea, cancela y consulta **solo lo suyo**; responsable aprueba, rechaza y finaliza; administrador y responsable consultan reservas y reportes | Adoptada |
+| D5 | No se crean ni aprueban reservas para recursos inactivos o en mantenimiento (§6, P07); se admiten pendientes solapadas y el conflicto se comprueba al aprobar (§4.4) | Adoptada |
+| D6 | El dueño cancela una PENDIENTE o APROBADA; el responsable finaliza una APROBADA. Sin restricciones de hora: el enunciado no las pide | Adoptada |
+| D7 | Solo los cambios de estado van al historial (§6); la creación no | Adoptada |
+| D8 | Observer para historial y avisos; Facade limitada a reservas (sección 6) | Aceptada |
+| D9 | Fecha de entrega, disponibilidad, grupo de dos admisible, patrones estudiados y §14–15 | Pendiente: docente |
+| D10 | Sin consulta de disponibilidad por intervalo: §4.2 solo pide listar recursos disponibles | Adoptada |
+| D11 | Utilización: horas de reservas FINALIZADAS | Adoptada |
+| D12 | Reparto de la sección 7 | Pendiente: Nicolain |
+
+Fuera del alcance por no exigirlo el enunciado: correo único, horarios, reservas en fechas pasadas, duración máxima y registro de intentos fallidos.
 
 | Reporte | Definición |
 |---|---|
@@ -231,7 +237,7 @@ Cada repositorio en memoria tiene un `Map<Long, Entidad>` (`LinkedHashMap`) y un
 | Utilización | Suma de horas de reservas FINALIZADAS por recurso |
 | Más solicitados | Recursos ordenados por cantidad de solicitudes, en cualquier estado |
 
-Indicadores propuestos en v0.4 (§12): tiempo promedio de aprobación (creación hasta el cambio a APROBADA); solicitudes atendidas (aprobadas más rechazadas); porcentaje de recursos disponibles.
+Indicadores propuestos en v0.5 (§12): tiempo promedio de aprobación (creación hasta el cambio a APROBADA); solicitudes atendidas (aprobadas más rechazadas); porcentaje de recursos disponibles.
 
 ## 6. Patrones
 
@@ -247,7 +253,8 @@ Indicadores propuestos en v0.4 (§12): tiempo promedio de aprobación (creación
 **Participantes:** sujeto `PublicadorReserva`; observador `ObservadorReserva`; concretos `RegistroHistorial` y `NotificadorReserva`.
 **Sin él:** cada comando repetiría las llamadas y habría que modificarlos para añadir una reacción.
 **Ventaja:** las reacciones se añaden suscribiendo una clase.
-**Riesgo:** si `Main` olvida suscribir el historial, se incumple §6. Lo cubre la prueba P09 armando el sistema como `Main`.
+**Historial garantizado:** el historial es obligatorio (§6), así que no depende de una suscripción. `PublicadorReserva` lo recibe en su constructor y lo notifica siempre, antes que a los observadores suscritos; sin él, el programa no se puede armar. Los avisos sí se suscriben.
+**Riesgo restante:** que un comando cambie el estado sin publicar. Lo cubre P09, que arma el sistema como `Main` y comprueba el historial tras aprobar, rechazar, cancelar y finalizar.
 
 ### Facade (estructural)
 
@@ -258,7 +265,7 @@ Indicadores propuestos en v0.4 (§12): tiempo promedio de aprobación (creación
 
 Aprobación: exigir RESPONSABLE → buscar reserva → recurso disponible → sin conflicto → `cambiarA(APROBADA)` → guardar → publicar.
 
-**Evaluación de la otra forma:** v0.4 plantea una fachada para que la consola use servicios de usuarios, recursos, reservas y reportes. Sobre estos servicios solo reenviaría llamadas, es decir, sería nominal. Por eso la fachada se limita a las reservas, donde sí hay coordinación.
+**Evaluación de la otra forma:** v0.5 plantea como candidata una fachada para que la consola use servicios de usuarios, recursos, reservas y reportes. Sobre estos servicios solo reenviaría llamadas, es decir, sería nominal. Por eso la fachada se limita a las reservas, donde sí hay coordinación.
 
 **Defensa y debilidad:** la fachada es a la vez el servicio de comandos de reservas. Se sostiene porque oculta cinco colaboradores y las reglas de cada uno viven en ellos; sería nominal si solo reenviara llamadas. No debe acumular reglas propias ni consultas. Si el docente no la acepta, la alternativa es Factory Method (creacional) para construir las notificaciones.
 
@@ -266,28 +273,49 @@ Ambos deben estar entre los patrones estudiados en el curso (§9.4): confirmar.
 
 Se descarta Adapter: sin servicio externo no hay interfaz incompatible que adaptar.
 
-## 7. Encargos
+## 7. Encargos y plan para dos
 
-| Quién | Código y pruebas | Documentos | Depende de | Horas |
+Sigue la distribución del documento maestro v0.5, **pendiente de confirmación de Nicolain**. Lo que v0.5 no asigna (`ControlAcceso`, publicador, ADR de persistencia, decisiones y calidad) se reparte aquí como propuesta.
+
+| Área | Mateo | h | Nicolain | h |
 |---|---|---|---|---|
-| **Mateo** | M1 dominio de reservas (4). M2 fachada y validador (7) | M3 C4 y 4+1 (5). M4 ADR de arquitectura, decisiones, calidad (4) | M1 → M2 | 20 |
-| **Michel** | D1 repositorios en memoria (3). D2 usuarios, recursos, permisos (6). D3 consultas y reportes (5) | D4 ER, clases, ADR de persistencia (6) | D1 → D2, D3 | 20 |
-| **Nicolain** | N1 menús y datos de demostración (6). N2 Observer, historial, avisos (3) | N3 casos de uso, secuencias, despliegue (6). N4 TOGAF, brechas, fases, indicadores, ADR de patrones (7) | N2 → M2; N1 usa firmas | 22 |
-| **Todos** | Acuerdo y preparación (3), revisión e integración (6) | Informe, capturas y evidencias (8), estudio y simulacro (12) | | 29 |
+| Código y pruebas | Contratos, dominio y `ControlAcceso` | 5 | Repositorios de usuarios, recursos y notificaciones | 1,5 |
+| | Repositorio de reservas e historial | 1,5 | Usuarios y recursos: comandos y consultas | 5 |
+| | `ValidadorDisponibilidad` y `ReservaFacade` | 7 | `PublicadorReserva` y `NotificadorReserva` | 2,5 |
+| | `RegistroHistorial` | 0,5 | Menús y datos de demostración | 6 |
+| | `ReservaConsultas` y `ReporteConsultas` | 5 | | |
+| Documentos | C4 y 4+1 | 5 | ER conceptual | 3 |
+| | ADR de arquitectura, decisiones y calidad | 4 | Casos de uso | 2,5 |
+| | Diagrama de clases | 2 | Secuencia de crear y despliegue | 2,5 |
+| | Secuencia de aprobar | 1 | TOGAF, brechas, fases e indicadores | 6 |
+| | | | ADR de persistencia y de patrones | 2 |
+| **Propio** | | **31** | | **31** |
 
-**Total base: 91 horas-persona; rango razonable 75–105** (25 a 35 cada uno): 62 de código, pruebas y documentos propios, y 29 compartidas. El documento v0.4 estima 45–60; la diferencia equivale aproximadamente a las horas de estudio, revisión, informe y acuerdos. Ambas cifras son juicios: medir la primera entrega.
+Compartido, 24 horas-persona: acuerdos (2), revisión e integración (4), informe y evidencias (8), estudio y ensayo (10).
 
-Revisión cruzada: Nicolain revisa a Mateo, Mateo a Michel, Michel a Nicolain. Todos explican el sistema completo.
+**Total: 86 horas-persona, unas 43 por persona; rango 70–100 (35–50 cada uno).** El documento v0.5 estima 45–60 (22,5–30 cada uno) y no desglosa estudio, revisión ni informe. Son juicios: medir las etapas 1 y 2 y confirmar disponibilidad antes de comprometer fecha.
 
-### Primer encargo, sin código de negocio
+### Trabajo en paralelo
 
-| Quién | Encargo | Terminado cuando |
-|---|---|---|
-| Mateo | Revisar el PR; confirmar fecha, patrones estudiados y §14–15; explicar la sección 3 | PR decidido y respuestas anotadas |
-| Michel | Revisar entidades y repositorios; ER lógico en borrador; ejecutar el proyecto en su equipo | Propone cambios o aprueba, y envía la salida de `verify` |
-| Nicolain | Menús y casos de uso en borrador; evaluar Observer y Facade; ejecutar el proyecto | Cada operación de D4 tiene menú; opina sobre D8 |
+El único bloqueo común es un primer PR pequeño con tipos de dominio, las cuatro interfaces de repositorio, `ObservadorReserva`, `CambioEstado` y `ControlAcceso`.
 
-Orden: acordar D1–D11 → M1 y D1 → primera entrega (registrar usuario y recurso, crear, aprobar, rechazar el solapamiento, historial) → demás estados y avisos → reportes → documentos y ensayo.
+| Etapa | Mateo | Nicolain | Terminada cuando |
+|---|---|---|---|
+| 0 Acuerdo | Decide el PR de simplificación; consulta al docente | Revisa ese PR, ejecuta el proyecto, confirma reparto | D1, D9 y D12 resueltas |
+| 1 Contratos | PR de contratos y dominio | Borrador de ER y casos de uso; revisa el PR | PR fusionado |
+| 2 Piezas | Repositorio de reservas, validador, `RegistroHistorial` | Sus repositorios, usuarios, recursos, publicador y avisos | Cada PR en verde y revisado |
+| 3 Primera entrega | Fachada: crear y aprobar | Menús de usuarios y recursos; después, crear y aprobar | Registrar, crear, aprobar, rechazar el solapamiento y ver historial por consola |
+| 4 Completar | Demás estados, consultas y reportes | Resto de menús, avisos, datos de demostración | P01–P10 con resultado real |
+| 5 Cierre | Sus documentos | Sus documentos | Informe revisado y ensayo |
+
+Reglas para no estorbarse:
+
+- Cada uno implementa sus repositorios y prueba lo suyo; las firmas de la sección 3 solo cambian si ambos acuerdan.
+- `Main` lo integra solo Mateo, para evitar conflictos.
+- La fachada y el publicador se encuentran en la etapa 3: el publicador debe estar fusionado antes.
+- Nicolain justifica los dos patrones, aunque Mateo programa `ReservaFacade`; ambos los defienden.
+- Los borradores de documentos pueden avanzar mientras se espera una revisión; los diagramas finales se ajustan al código.
+- Revisión mutua: nadie fusiona su propio PR. Ambos explican el sistema completo.
 
 ## 8. Matriz de cumplimiento
 
@@ -295,45 +323,45 @@ Todo está **pendiente**: la matriz dice cómo se cumplirá, no que se cumpla.
 
 | § | Requisito | Cómo y evidencia prevista | Dueño |
 |---|---|---|---|
-| 1–3 | Contexto, nombre, objetivo | Informe; UniReserva, universidad ficticia | Todos |
-| 4.1 | Registrar, rol, consultar usuarios | `UsuarioComandos`, `UsuarioConsultas`; P01, EX01 | Michel |
-| 4.1.4 | Control por rol | `ControlAcceso`; P08 | Michel |
-| 4.2 | Recursos: registrar, disponibles, modificar, estado, tipo | `RecursoComandos`, `RecursoConsultas`; P02, P07, EX02 | Michel |
+| 1–3 | Contexto, nombre, objetivo | Informe; UniReserva, universidad ficticia | Ambos |
+| 4.1 | Registrar, rol, consultar usuarios | `UsuarioComandos`, `UsuarioConsultas`; P01, EX01 | Nicolain |
+| 4.1.4 | Control por rol | `ControlAcceso`; P08 | Mateo |
+| 4.2 | Recursos: registrar, disponibles, modificar, estado, tipo | `RecursoComandos`, `RecursoConsultas`; P02, P07, EX02 | Nicolain |
 | 4.3.1–5 | Crear con recurso, inicio, fin, motivo | `ReservaFacade.crearReserva`; P03, P04 | Mateo |
-| 4.3.6, 4.3.9 | Consultar y filtrar | `ReservaConsultas`; EX03 | Michel |
+| 4.3.6, 4.3.9 | Consultar y filtrar | `ReservaConsultas`; EX03 | Mateo |
 | 4.3.7–8 | Aprobar, rechazar, cancelar | `ReservaFacade`; P05, EX04 | Mateo |
 | 4.4 | Conflictos y consecutivas | `ValidadorDisponibilidad`; P06, EX05 | Mateo |
 | 4.5 | Notificaciones | `NotificadorReserva`, mostradas en consola; EX07 | Nicolain |
-| 4.6 | Cuatro reportes | `ReporteConsultas`; P10 | Michel |
-| 5 | Cinco entidades y estados | `domain`; FINALIZADA con `finalizarReserva` | Mateo, Michel |
+| 4.6 | Cuatro reportes | `ReporteConsultas`; P10 | Mateo |
+| 5 | Cinco entidades y estados | `domain`; FINALIZADA con `finalizarReserva` | Mateo, Nicolain |
 | 6 R1–R2 | Usuario y recurso existentes; fechas | Fachada y `Reserva`; P03, P04, EX08 | Mateo |
 | 6 R3–R5 | Recurso no disponible, solapamiento, autorización | Validador y acceso; P06–P08 | Mateo |
-| 6 R6 | Solicitante consulta las suyas | `ReservaConsultas`; EX03 | Michel |
+| 6 R6 | Solicitante consulta las suyas | `ReservaConsultas`; EX03 | Mateo |
 | 6 R7 | Cancelada no se reaprueba | `EstadoReserva`; EX04 | Mateo |
-| 6 R8–R9 | Historial y notificaciones | Observadores; P09, EX07 | Nicolain |
-| 6 R10 | Reportes con datos registrados | Leen repositorios; P10, EX10 | Michel |
-| 7 | POO, capas, interfaces, repositorios, servicios, DI, validación, persistencia, errores, patrones | Código; errores de dominio mostrados por consola | Todos |
+| 6 R8–R9 | Historial y notificaciones | Observadores; P09, EX07 | Mateo (historial), Nicolain (avisos) |
+| 6 R10 | Reportes con datos registrados | Leen repositorios; P10, EX10 | Mateo |
+| 7 | POO, capas, interfaces, repositorios, servicios, DI, validación, persistencia, errores, patrones | Código; errores de dominio mostrados por consola | Ambos |
 | 8 | Arquitectura y sus siete preguntas | Sección 9; ADR 001 | Mateo |
-| 9.1–9.3 | Repository, DI, CQRS | Sección 6 | Michel, Mateo |
+| 9.1–9.3 | Repository, DI, CQRS | Sección 6 | Mateo |
 | 9.4 | Dos GoF y sus siete preguntas, con diagrama de relación | Sección 6; ADR 003 | Nicolain |
 | 10 | Cuatro atributos, dos escenarios | Sección 9 | Mateo |
 | 11.1 | Tres decisiones de diseño y tres arquitectónicas | Sección 9 | Mateo |
 | 11.2 | C4: contexto, contenedores, componentes | Contenedor único: aplicación de consola con almacenamiento en memoria | Mateo |
 | 11.3 | 4+1 | Descripción de cinco vistas | Mateo |
-| 11.4 | Casos de uso; secuencias crear y aprobar | Mermaid o PlantUML según el código | Nicolain |
-| 11.4 | Clases; entidad–relación | ER **lógico** de las colecciones, declarado como tal | Michel |
+| 11.4 | Casos de uso; secuencias crear y aprobar | Mermaid o PlantUML según el código | Nicolain (casos y crear), Mateo (aprobar) |
+| 11.4 | Clases; entidad–relación | ER **lógico** de las colecciones, declarado como tal | Mateo (clases), Nicolain (ER) |
 | 11.4 | Componentes; despliegue | Componentes reutiliza C4; despliegue: una JVM en un equipo | Mateo, Nicolain |
-| 11.5 | Tres ADR completos | Hexagonal; persistencia y Repository; GoF | Cada dueño |
+| 11.5 | Tres ADR completos | Hexagonal; persistencia y Repository; GoF | Mateo, Nicolain |
 | 12 | Siete preguntas empresariales y tres indicadores | Informe | Nicolain |
 | 13 | Actual, objetivo, cuatro brechas, cuatro fases | Separar lo hecho de lo futuro | Nicolain |
 | 16 | P01–P10 con entrada, esperado, obtenido, estado | JUnit y tabla de evidencias | Cada dueño |
-| 17.1 | Documento final con todas sus secciones, incluidas conclusiones | Informe en Drive | Todos |
-| 17.2 | Código y README | Repositorio | Todos |
-| 17.3 | Capturas, funcionalidades, resultados, explicación | Evidencias; script de base de datos: no aplica | Todos |
-| 17.4 | Sustentación con participación de todos | Simulacro | Todos |
-| 18 | Etapas progresivas | Orden de la sección 7 | Todos |
-| 19, 21 | Criterios y producto esperado | Lista de comprobación final | Todos |
-| 20 | Diez restricciones | Coherencia código-documentos, sin patrones nominales, la consola no accede a datos, trabajo nuevo y comprendido, conflictos validados | Todos |
+| 17.1 | Documento final con todas sus secciones, incluidas conclusiones | Informe en Drive | Ambos |
+| 17.2 | Código y README | Repositorio | Ambos |
+| 17.3 | Capturas, funcionalidades, resultados, explicación | Evidencias; script de base de datos: no aplica | Ambos |
+| 17.4 | Sustentación con participación de todos | Simulacro | Ambos |
+| 18 | Etapas progresivas | Orden de la sección 7 | Ambos |
+| 19, 21 | Criterios y producto esperado | Lista de comprobación final | Ambos |
+| 20 | Diez restricciones | Coherencia código-documentos, sin patrones nominales, la consola no accede a datos, trabajo nuevo y comprendido, conflictos validados | Ambos |
 
 El enunciado no tiene §14 ni §15: preguntar al docente.
 
@@ -341,7 +369,7 @@ El enunciado no tiene §14 ni §15: preguntar al docente.
 
 Obligatorias: P01 registrar usuario; P02 registrar recurso; P03 reserva válida; P04 fin anterior al inicio; P05 aprobar disponible; P06 rechazar conflicto; P07 reservar en mantenimiento; P08 aprobar sin permiso; P09 cambio de estado e historial; P10 reporte con datos registrados.
 
-Comprobaciones de cobertura (v0.4), no requisitos nuevos: EX01 roles y consulta de usuarios; EX02 modificar, clasificar y cambiar estado; EX03 filtros y privacidad; EX04 transiciones; EX05 consecutivas; EX07 historial y avisos; EX08 referencias inexistentes; EX10 reportes y datos vacíos. EX06 y EX09 quedan fuera por no haber concurrencia ni base de datos.
+Comprobaciones de cobertura (v0.5), no requisitos nuevos: EX01 roles y consulta de usuarios; EX02 modificar, clasificar y cambiar estado; EX03 filtros y privacidad; EX04 transiciones; EX05 consecutivas; EX07 historial y avisos; EX08 referencias inexistentes; EX10 reportes y datos vacíos. EX06 y EX09 quedan fuera por no haber concurrencia ni base de datos.
 
 Cada prueba se registra con identificador, funcionalidad, entrada, resultado esperado, obtenido, estado y commit.
 
@@ -354,7 +382,7 @@ Cada prueba se registra con identificador, funcionalidad, entrada, resultado esp
 | Seguridad (autorización) | Aprobaciones indebidas | `ControlAcceso` en cada servicio | **Escenario:** P08 |
 | Trazabilidad | No saber quién cambió qué | Observador de historial | **Escenario:** P09 |
 | Modificabilidad | Un cambio rompe todo | Puertos y observadores | Añadir un observador sin tocar la fachada |
-| Testeabilidad | Reglas sin verificar | Dominio sin consola; DI; `Clock` | Pruebas sin infraestructura |
+| Testeabilidad | Reglas sin verificar | Dominio sin consola; DI | Pruebas sin infraestructura |
 
 Decisiones arquitectónicas: hexagonal; persistencia en memoria tras Repository; separar comandos y consultas. Decisiones de diseño: `record` inmutables; transiciones dentro de `EstadoReserva`; intervalo semiabierto.
 
