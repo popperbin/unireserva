@@ -1,62 +1,49 @@
 # UniReserva
 
-Prototipo académico para gestionar recursos y reservas universitarias (Arquitectura de Software Empresarial).
+Prototipo académico de gestión de recursos y reservas universitarias (Arquitectura de Software Empresarial).
 
-**Estado: Sprint 0 técnico.** Hay un esqueleto que compila, arranca y se prueba. No hay funcionalidades de negocio.
+Aplicación **Java 21 de consola**, sin frameworks ni base de datos. Los datos vivirán en memoria y se perderán al cerrar el programa.
+
+**Estado: base técnica.** El menú solo permite salir. No hay funcionalidades de negocio.
 
 | Integrante | Área |
 |---|---|
-| Mateo Avellaneda | Arquitectura, reservas e integración |
-| Michel Diaz | Arquitectura de datos, persistencia, usuarios y recursos |
-| Nicolain de Castro | Interfaz, patrones y arquitectura empresarial |
+| Mateo Avellaneda | Arquitectura, contratos, reservas, historial, reportes e integración |
+| Nicolain de Castro | Datos (ER), usuarios, recursos, consola, notificaciones, patrones y TOGAF |
 
-## Requisitos
+## Ejecutar
 
-- Git.
-- JDK 21 (`.\mvnw.cmd -v` debe mostrar Java 21; usa `JAVA_HOME`). En Windows: `winget install EclipseAdoptium.Temurin.21.JDK`.
-- Docker Desktop en ejecución.
-- Maven **no** hace falta: `mvnw` descarga la versión fijada (necesita internet la primera vez).
+Requisitos: Git y JDK 21. Maven no se instala: `mvnw` lo descarga la primera vez (necesita internet).
 
-## Puesta en marcha
-
-Todos los comandos se ejecutan desde la raíz del repositorio (PowerShell).
+Windows (PowerShell), desde la raíz del repositorio:
 
 ```powershell
-Copy-Item .env.example .env      # luego escribe una contraseña en POSTGRES_PASSWORD
-docker compose up -d --wait      # PostgreSQL en 127.0.0.1:5433
-.\mvnw.cmd verify                # compila, prueba y empaqueta
-.\mvnw.cmd spring-boot:run       # http://127.0.0.1:8080  (Ctrl+C para detener)
-docker compose down              # detiene la base; conserva los datos
+.\mvnw.cmd verify                                  # compila, prueba y empaqueta
+java -jar target\unireserva-0.1.0-SNAPSHOT.jar     # menú; escribe 0 para salir
 ```
 
-En Linux/macOS: `cp .env.example .env` y `./mvnw` en lugar de `.\mvnw.cmd`.
+Linux o macOS:
 
-Abrir <http://127.0.0.1:8080> devuelve **404**: es lo esperado, todavía no hay páginas.
+```bash
+./mvnw verify
+java -jar target/unireserva-0.1.0-SNAPSHOT.jar
+```
 
-## Problemas frecuentes
-
-| Síntoma | Causa y solución |
-|---|---|
-| `Could not resolve placeholder 'POSTGRES_PASSWORD'` o fallo de autenticación | Falta `.env` o la contraseña está vacía |
-| `Connection refused` en las pruebas | La base no está levantada: `docker compose up -d --wait` |
-| `release version 21 not supported` | `JAVA_HOME` apunta a otro Java |
-| Puerto 5433 ocupado | Cambia `POSTGRES_PORT` en `.env` |
-| Cambiaste la contraseña y ya no conecta | PostgreSQL la fija al crear el volumen. `docker compose down -v` lo recrea y **borra los datos locales** |
+Si `.\mvnw.cmd -v` no muestra Java 21, ver la [guía de incorporación](docs/incorporacion.md).
 
 ## Estructura
 
 ```text
-.github/workflows/ci.yml   Integración continua
-.mvn/, mvnw, mvnw.cmd      Maven Wrapper
+.github/workflows/ci.yml        Integración continua
+.mvn/, mvnw, mvnw.cmd           Maven Wrapper
 src/main/java/com/unireserva/
-  usuarios/ recursos/ reservas/ notificaciones/ reportes/
-src/main/resources/        Configuración y migraciones Flyway
-src/test/java/             Pruebas
-docs/                      arquitectura/ adr/ diagramas/ pruebas/ informe-sprint0.md
-compose.yaml               PostgreSQL local
-pom.xml                    Dependencias y compilación
+  Main.java                     Arranque y composición de objetos
+  consola/                      Menú (adaptador de entrada)
+src/test/java/                  Pruebas JUnit
+docs/diseno-minimo.md           Propuesta de diseño, encargos y matriz de cumplimiento
+docs/incorporacion.md           Preparar el equipo
+scripts/usar-jdk21.ps1          Activar JDK 21 en una terminal
+pom.xml                         Compilación; única dependencia: JUnit (pruebas)
 ```
 
 Colaboración: [CONTRIBUTING.md](CONTRIBUTING.md) · Asistentes de IA: [AGENTS.md](AGENTS.md)
-
-Gestión en Jira, documentación académica en Google Drive, código en GitHub.

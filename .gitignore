@@ -1,10 +1,9 @@
 # Compilacion
 target/
 
-# Secretos locales
+# Archivos locales que nunca se suben
 .env
-.env.*
-!.env.example
+*.log
 
 # IDE y sistema
 .idea/
@@ -15,4 +14,3 @@ target/
 .settings/
 Thumbs.db
 .DS_Store
-*.log
