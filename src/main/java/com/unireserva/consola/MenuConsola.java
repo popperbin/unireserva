@@ -1,38 +1,51 @@
 package com.unireserva.consola;
 
-import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
- * Adaptador de entrada: lee opciones y muestra resultados. No contiene reglas de
- * negocio, validaciones de dominio, permisos ni acceso a datos.
+ * Menu principal, adaptador de entrada: elige el usuario que actua (D3, no es autenticacion) y
+ * delega en los submenus. No contiene reglas de negocio, permisos ni acceso a datos.
  */
 public class MenuConsola {
 
-	private final BufferedReader entrada;
-	private final PrintStream salida;
+	private final Entrada entrada;
+	private final MenuAdministracion administracion;
+	private final MenuReservas reservas;
+	private final String bienvenida;
 
-	/** Recibe la entrada y la salida para poder probar el menu sin teclado. */
-	public MenuConsola(BufferedReader entrada, PrintStream salida) {
+	public MenuConsola(Entrada entrada, MenuAdministracion administracion, MenuReservas reservas, String bienvenida) {
 		this.entrada = entrada;
-		this.salida = salida;
+		this.administracion = administracion;
+		this.reservas = reservas;
+		this.bienvenida = bienvenida;
 	}
 
 	public void ejecutar() throws IOException {
-		salida.println("UniReserva - aun no hay operaciones disponibles.");
-		while (true) {
-			salida.println("0. Salir");
-			salida.print("> ");
-			String opcion = entrada.readLine();
-			// null: la entrada se cerro (Ctrl+Z, Ctrl+D o fin de una tuberia).
-			// ﻿: marca invisible que algunas terminales de Windows anteponen al texto enviado por tuberia.
-			if (opcion == null || opcion.replace("﻿", "").strip().equals("0")) {
-				salida.println("Hasta luego.");
-				return;
+		entrada.mostrar("UniReserva");
+		entrada.mostrar(bienvenida);
+		try {
+			long actor = entrada.numero("Id de usuario:");
+			while (true) {
+				entrada.mostrar("""
+						Usuario actual: %d
+						1. Usuarios y recursos
+						2. Reservas y reportes
+						3. Cambiar de usuario
+						0. Salir""".formatted(actor));
+				switch (entrada.texto(">")) {
+					case "1" -> administracion.ejecutar(actor);
+					case "2" -> reservas.ejecutar(actor);
+					case "3" -> actor = entrada.numero("Id de usuario:");
+					case "0" -> {
+						entrada.mostrar("Hasta luego.");
+						return;
+					}
+					default -> entrada.mostrar("Opcion no valida.");
+				}
 			}
-			salida.println("Opcion no valida.");
+		} catch (EOFException e) {
+			entrada.mostrar("Hasta luego.");
 		}
 	}
-
 }
