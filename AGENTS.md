@@ -4,7 +4,7 @@ Proyecto académico de dos estudiantes: deben poder entender y defender cada lí
 
 ## Estado
 
-Base técnica. **No implementar funcionalidad de negocio** hasta que el equipo acuerde el diseño de detalle (`docs/diseno-minimo.md`).
+Diseño ratificado; etapa 1 (contratos y dominio) en curso. Seguir el reparto y las etapas de `docs/diseno-minimo.md` (sección 7). Las firmas de la sección 3 solo cambian si ambos integrantes lo acuerdan.
 
 ## Stack acordado
 

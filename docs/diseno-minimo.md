@@ -1,12 +1,12 @@
 # UniReserva: mínimo académico completo
 
-**Equipo: Mateo Avellaneda y Nicolain de Castro. Stack mínimo acordado** (documento maestro v0.5). **El diseño de detalle es una propuesta sin aprobar; no hay funcionalidad implementada.** 27 de noviembre de 2026. Preparado con asistencia de Claude Code.
+**Equipo: Mateo Avellaneda y Nicolain de Castro. Diseño ratificado** (documento maestro v0.6). **Etapa 1: contratos y dominio en código; servicios, repositorios en memoria y menús pendientes.** Entrega: 2 de diciembre de 2026. Actualizado el 27 de noviembre de 2026. Preparado con asistencia de Claude Code.
 
-Fuente que manda: el enunciado del profesor (§). Las tareas de Jira no se han revisado.
+Fuente que manda: el enunciado del profesor (§).
 
 ## 1. Qué es obligatorio, qué hay que decidir y qué sobra
 
-| Obligatorio (enunciado) | Decisión imprescindible para cumplirlo (propuesta) | Fuera del alcance |
+| Obligatorio (enunciado) | Decisión imprescindible para cumplirlo | Fuera del alcance |
 |---|---|---|
 | Usuarios con roles y control de operaciones (§4.1) | Elegir un usuario existente al iniciar | Contraseñas, sesiones |
 | Recursos: registrar, consultar, modificar, estado, tipo (§4.2) | Tipos como `enum` | Catálogo editable, borrado |
@@ -24,11 +24,11 @@ Fuente que manda: el enunciado del profesor (§). Las tareas de Jira no se han r
 
 ## 2. Estado de la base técnica
 
-El Pull Request de simplificación contiene `Main`, un menú que solo permite salir, sus pruebas, un `pom.xml` cuya única dependencia es JUnit y una CI sin servicios. Sustituye a los PR #1 (infraestructura), #2 (staging) y #3 (consola con Spring), que conviene cerrar sin fusionar. De #3 reutiliza el menú, la guía y el script de JDK. El historial conserva lo retirado.
+`main` contiene `Main`, un menú que solo permite salir, un `pom.xml` cuya única dependencia es JUnit y una CI sin servicios (PR #4, fusión `1143bf8`; #1–#3 cerrados sin fusionar). La etapa 1 añade los tipos de `domain`, los puertos de `application` y `ControlAcceso`, con sus pruebas.
 
 ## 3. Estructura mínima
 
-Se organiza por capa: con unas 40 clases, pocas carpetas muestran la hexagonal con claridad. El documento v0.5 (pestaña 02) admite mantener módulos "si son útiles"; esta propuesta prescinde de ellos y hay que acordarlo (D2). Cada carpeta se crea con su primera clase.
+Se organiza por capa: con unas 40 clases, pocas carpetas muestran la hexagonal con claridad. El documento maestro admite módulos "si son útiles"; el equipo prescinde de ellos (D2). Cada carpeta se crea con su primera clase.
 
 ```text
 com.unireserva
@@ -215,7 +215,7 @@ Criterio acordado: la alternativa más sencilla que cumpla íntegramente el enun
 
 | ID | Decisión | Estado |
 |---|---|---|
-| D1 | Fusionar el PR de simplificación y cerrar #1–#3 | Pendiente |
+| D1 | Fusionar el PR de simplificación y cerrar #1–#3 | Hecha (`1143bf8`) |
 | D2 | Estructura por capas de la sección 3, en lugar de módulos | Aceptada |
 | D3 | Identidad: elegir un usuario existente y activo. No es autenticación | Adoptada |
 | D4 | Administrador gestiona usuarios y recursos; solicitante crea, cancela y consulta **solo lo suyo**; responsable aprueba, rechaza y finaliza; administrador y responsable consultan reservas y reportes | Adoptada |
@@ -223,10 +223,10 @@ Criterio acordado: la alternativa más sencilla que cumpla íntegramente el enun
 | D6 | El dueño cancela una PENDIENTE o APROBADA; el responsable finaliza una APROBADA. Sin restricciones de hora: el enunciado no las pide | Adoptada |
 | D7 | Solo los cambios de estado van al historial (§6); la creación no | Adoptada |
 | D8 | Observer para historial y avisos; Facade limitada a reservas (sección 6) | Aceptada |
-| D9 | Fecha de entrega, disponibilidad, grupo de dos admisible, patrones estudiados y §14–15 | Pendiente: docente |
+| D9 | Entrega el 2 de diciembre de 2026; el docente admite grupos de dos y estudió Observer y Facade en clase | Pendiente: disponibilidad y, si procede, numeración §14–15 |
 | D10 | Sin consulta de disponibilidad por intervalo: §4.2 solo pide listar recursos disponibles | Adoptada |
 | D11 | Utilización: horas de reservas FINALIZADAS | Adoptada |
-| D12 | Reparto de la sección 7 | Pendiente: Nicolain |
+| D12 | Reparto de la sección 7 | Ratificada |
 
 Fuera del alcance por no exigirlo el enunciado: correo único, horarios, reservas en fechas pasadas, duración máxima y registro de intentos fallidos.
 
@@ -237,7 +237,7 @@ Fuera del alcance por no exigirlo el enunciado: correo único, horarios, reserva
 | Utilización | Suma de horas de reservas FINALIZADAS por recurso |
 | Más solicitados | Recursos ordenados por cantidad de solicitudes, en cualquier estado |
 
-Indicadores propuestos en v0.5 (§12): tiempo promedio de aprobación (creación hasta el cambio a APROBADA); solicitudes atendidas (aprobadas más rechazadas); porcentaje de recursos disponibles.
+Indicadores propuestos (§12): tiempo promedio de aprobación (creación hasta el cambio a APROBADA); solicitudes atendidas (aprobadas más rechazadas); porcentaje de recursos disponibles.
 
 ## 6. Patrones
 
@@ -265,17 +265,17 @@ Indicadores propuestos en v0.5 (§12): tiempo promedio de aprobación (creación
 
 Aprobación: exigir RESPONSABLE → buscar reserva → recurso disponible → sin conflicto → `cambiarA(APROBADA)` → guardar → publicar.
 
-**Evaluación de la otra forma:** v0.5 plantea como candidata una fachada para que la consola use servicios de usuarios, recursos, reservas y reportes. Sobre estos servicios solo reenviaría llamadas, es decir, sería nominal. Por eso la fachada se limita a las reservas, donde sí hay coordinación.
+**Evaluación de la otra forma:** el documento maestro planteaba como candidata una fachada para que la consola use servicios de usuarios, recursos, reservas y reportes. Sobre estos servicios solo reenviaría llamadas, es decir, sería nominal. Por eso la fachada se limita a las reservas, donde sí hay coordinación.
 
 **Defensa y debilidad:** la fachada es a la vez el servicio de comandos de reservas. Se sostiene porque oculta cinco colaboradores y las reglas de cada uno viven en ellos; sería nominal si solo reenviara llamadas. No debe acumular reglas propias ni consultas. Si el docente no la acepta, la alternativa es Factory Method (creacional) para construir las notificaciones.
 
-Ambos deben estar entre los patrones estudiados en el curso (§9.4): confirmar.
+Ambos se estudiaron en el curso (§9.4), según el docente.
 
 Se descarta Adapter: sin servicio externo no hay interfaz incompatible que adaptar.
 
 ## 7. Encargos y plan para dos
 
-Sigue la distribución del documento maestro v0.5, **pendiente de confirmación de Nicolain**. Lo que v0.5 no asigna (`ControlAcceso`, publicador, ADR de persistencia, decisiones y calidad) se reparte aquí como propuesta.
+Distribución del documento maestro, aceptada por Nicolain (D12). Incluye lo que aquel no asignaba: `ControlAcceso`, publicador, ADR de persistencia, decisiones y calidad.
 
 | Área | Mateo | h | Nicolain | h |
 |---|---|---|---|---|
@@ -293,20 +293,20 @@ Sigue la distribución del documento maestro v0.5, **pendiente de confirmación 
 
 Compartido, 24 horas-persona: acuerdos (2), revisión e integración (4), informe y evidencias (8), estudio y ensayo (10).
 
-**Total: 86 horas-persona, unas 43 por persona; rango 70–100 (35–50 cada uno).** El documento v0.5 estima 45–60 (22,5–30 cada uno) y no desglosa estudio, revisión ni informe. Son juicios: medir las etapas 1 y 2 y confirmar disponibilidad antes de comprometer fecha.
+**Total: 86 horas-persona, unas 43 por persona; rango 70–100 (35–50 cada uno).** El documento maestro estima 45–60 (22,5–30 cada uno) sin desglosar estudio, revisión ni informe. Ambas cifras son orientativas; con la entrega el 2 de diciembre equivalen a unas 8 horas diarias por persona.
 
 ### Trabajo en paralelo
 
 El único bloqueo común es un primer PR pequeño con tipos de dominio, las cuatro interfaces de repositorio, `ObservadorReserva`, `CambioEstado` y `ControlAcceso`.
 
-| Etapa | Mateo | Nicolain | Terminada cuando |
-|---|---|---|---|
-| 0 Acuerdo | Decide el PR de simplificación; consulta al docente | Revisa ese PR, ejecuta el proyecto, confirma reparto | D1, D9 y D12 resueltas |
-| 1 Contratos | PR de contratos y dominio | Borrador de ER y casos de uso; revisa el PR | PR fusionado |
-| 2 Piezas | Repositorio de reservas, validador, `RegistroHistorial` | Sus repositorios, usuarios, recursos, publicador y avisos | Cada PR en verde y revisado |
-| 3 Primera entrega | Fachada: crear y aprobar | Menús de usuarios y recursos; después, crear y aprobar | Registrar, crear, aprobar, rechazar el solapamiento y ver historial por consola |
-| 4 Completar | Demás estados, consultas y reportes | Resto de menús, avisos, datos de demostración | P01–P10 con resultado real |
-| 5 Cierre | Sus documentos | Sus documentos | Informe revisado y ensayo |
+| Etapa | Mateo | Nicolain | Terminada cuando | Fecha objetivo |
+|---|---|---|---|---|
+| 0 Acuerdo | Decide el PR de simplificación; consulta al docente | Revisa ese PR, ejecuta el proyecto, confirma reparto | D1, D9 y D12 resueltas | Hecha |
+| 1 Contratos | PR de contratos y dominio | Borrador de ER y casos de uso; revisa el PR | PR fusionado | 27 nov |
+| 2 Piezas | Repositorio de reservas, validador, `RegistroHistorial` | Sus repositorios, usuarios, recursos, publicador y avisos | Cada PR en verde y revisado | 28 nov |
+| 3 Primera entrega | Fachada: crear y aprobar | Menús de usuarios y recursos; después, crear y aprobar | Registrar, crear, aprobar, rechazar el solapamiento y ver historial por consola | 29 nov |
+| 4 Completar | Demás estados, consultas y reportes | Resto de menús, avisos, datos de demostración | P01–P10 con resultado real | 30 nov |
+| 5 Cierre | Sus documentos | Sus documentos | Informe revisado y ensayo | 1 dic |
 
 Reglas para no estorbarse:
 
@@ -363,13 +363,13 @@ Todo está **pendiente**: la matriz dice cómo se cumplirá, no que se cumpla.
 | 19, 21 | Criterios y producto esperado | Lista de comprobación final | Ambos |
 | 20 | Diez restricciones | Coherencia código-documentos, sin patrones nominales, la consola no accede a datos, trabajo nuevo y comprendido, conflictos validados | Ambos |
 
-El enunciado no tiene §14 ni §15: preguntar al docente.
+El enunciado no tiene §14 ni §15: aclararlo con el docente si procede (D9).
 
 ### Pruebas
 
 Obligatorias: P01 registrar usuario; P02 registrar recurso; P03 reserva válida; P04 fin anterior al inicio; P05 aprobar disponible; P06 rechazar conflicto; P07 reservar en mantenimiento; P08 aprobar sin permiso; P09 cambio de estado e historial; P10 reporte con datos registrados.
 
-Comprobaciones de cobertura (v0.5), no requisitos nuevos: EX01 roles y consulta de usuarios; EX02 modificar, clasificar y cambiar estado; EX03 filtros y privacidad; EX04 transiciones; EX05 consecutivas; EX07 historial y avisos; EX08 referencias inexistentes; EX10 reportes y datos vacíos. EX06 y EX09 quedan fuera por no haber concurrencia ni base de datos.
+Comprobaciones de cobertura (documento maestro), no requisitos nuevos: EX01 roles y consulta de usuarios; EX02 modificar, clasificar y cambiar estado; EX03 filtros y privacidad; EX04 transiciones; EX05 consecutivas; EX07 historial y avisos; EX08 referencias inexistentes; EX10 reportes y datos vacíos. EX06 y EX09 quedan fuera por no haber concurrencia ni base de datos.
 
 Cada prueba se registra con identificador, funcionalidad, entrada, resultado esperado, obtenido, estado y commit.
 
@@ -388,13 +388,13 @@ Decisiones arquitectónicas: hexagonal; persistencia en memoria tras Repository;
 
 ## 10. Verificación de los contratos
 
-Los fragmentos Java de la sección 3 se extrajeron a un proyecto temporal con los paquetes `domain` y `application`, servicios con cuerpos vacíos y el mismo `pom.xml` del PR.
+Los tipos de la sección 3, salvo los servicios, están en `src/main/java` desde la etapa 1.
 
 | Comprobación | Resultado |
 |---|---|
-| Compilación de 29 tipos con JDK 21 | `BUILD SUCCESS` |
-| Pruebas de solapamiento, consecutivas, fechas inválidas y cancelada no aprobable | `Tests run: 3, Failures: 0, Errors: 0` |
+| `.\mvnw.cmd verify` con JDK 21 | `BUILD SUCCESS`; 13 pruebas, 0 fallos |
+| `DominioTests` | Fechas (P04), motivo, solapamiento (P06) y consecutivas (EX05), transiciones (EX04), datos básicos |
+| `ControlAccesoTests` | Rol permitido, solicitante que aprueba (P08), usuario inexistente o inactivo |
 | Dependencias entre paquetes (`jdeps`) | Solo `application → domain` |
-| Dependencias Maven | Únicamente JUnit y sus transitivas, en alcance de prueba |
 
-No verificado: implementación de los servicios, repositorios en memoria, menús y patrones. Ninguna prueba P o EX se ha ejecutado.
+Las pruebas P04, P06 y P08 cubren aquí la regla de dominio; su versión completa, a través de la fachada, llega con los servicios. Ninguna otra prueba P o EX se ha ejecutado.
